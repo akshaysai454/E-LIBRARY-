@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Reader</title>
+    <link rel="stylesheet" href="style.css" />
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+    <script>
+        // Set the workerSrc property for PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
+    </script>
+</head>
+
+<body>
+    <h1>PDF Reader</h1>
+    <div class="controls">
+        <button id="downloadBtn">Download PDF</button>
+    </div>
+    <div id="pdfContainer" class="pdf-container"></div>
+
+    <script src="js/reader.js"></script>
+</body>
+
+</html>
