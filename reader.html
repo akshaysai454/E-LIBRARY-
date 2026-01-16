@@ -17,9 +17,18 @@
 <body>
     <h1>PDF Reader</h1>
     <div class="controls">
+        <button id="prevPageBtn">Prev</button>
+        <button id="nextPageBtn">Next</button>
+        <button id="zoomOutBtn">–</button>
+        <button id="zoomInBtn">+</button>
+        <input type="number" id="pageInput" min="1" placeholder="Pg #" style="width: 50px; margin-left: 10px;">
+        <button id="goPageBtn">Go</button>
         <button id="downloadBtn">Download PDF</button>
+        <span id="pageIndicator" style="margin-left:10px;">Page 1 / ?</span>
     </div>
-    <div id="pdfContainer" class="pdf-container"></div>
+    <div class="pdf-reader">
+        <div id="pdfContainer" class="pdf-container"></div>
+    </div>
 
     <script src="js/reader.js"></script>
 </body>

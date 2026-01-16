@@ -60,6 +60,14 @@ h1 {
 .controls {
   text-align: right;
   margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  background-color: #121212;
+  /* Match body bg to avoid transparency issues */
+  z-index: 1000;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+  /* Optional visual separation */
 }
 
 #downloadBtn {
