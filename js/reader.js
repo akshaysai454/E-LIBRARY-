@@ -2,9 +2,18 @@
 // Loads a PDF from a GitHub raw link using PDF.js, provides download and zoom controls.
 
 (function () {
-  // Direct download URL for the PDF (GitHub raw link)
-  const pdfUrl = 'https://raw.githubusercontent.com/akshaysai454/E-LIBRARY-/main/FWD%20QB%20MID%202%20Descriptive%20(1).pdf';
-  const pdfFileName = 'sample-book.pdf'; // filename for the download attribute
+  // Read PDF URL from query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const pdfUrl = urlParams.get('file');
+
+  // Extract filename from URL for download, or use a default
+  const pdfFileName = pdfUrl ? pdfUrl.split('/').pop().replace(/%20/g, ' ') : 'document.pdf';
+
+  // Check if PDF URL is provided
+  if (!pdfUrl) {
+    document.getElementById('pdfContainer').innerText = 'No PDF file specified.';
+    return;
+  }
 
   const pdfContainer = document.getElementById('pdfContainer');
   const downloadBtn = document.getElementById('downloadBtn');
