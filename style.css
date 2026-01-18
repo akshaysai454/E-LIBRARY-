@@ -83,6 +83,38 @@ h1 {
   background: #357ab8;
 }
 
+/* Search controls */
+#searchInput {
+  padding: 6px 10px;
+  background: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+
+#searchBtn,
+#prevMatchBtn,
+#nextMatchBtn {
+  padding: 6px 12px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+#searchBtn:hover,
+#prevMatchBtn:hover,
+#nextMatchBtn:hover {
+  background: #357ab8;
+}
+
+#searchResults {
+  color: #fafafa;
+  font-size: 14px;
+}
+
 .pdf-container canvas {
   display: block;
   margin: 10px auto;
