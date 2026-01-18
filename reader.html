@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Reader</title>
+    <link rel="stylesheet" href="style.css" />
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+    <script>
+        // Set the workerSrc property for PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
+    </script>
+</head>
+
+<body>
+    <h1>PDF Reader</h1>
+    <div class="controls">
+        <button id="prevPageBtn">Prev</button>
+        <button id="nextPageBtn">Next</button>
+        <button id="zoomOutBtn">–</button>
+        <button id="zoomInBtn">+</button>
+        <input type="number" id="pageInput" min="1" placeholder="Pg #" style="width: 50px; margin-left: 10px;">
+        <button id="goPageBtn">Go</button>
+        <button id="downloadBtn">Download PDF</button>
+        <span id="pageIndicator" style="margin-left:10px;">Page 1 / ?</span>
+        <input type="text" id="searchInput" placeholder="Find in document" style="width: 150px; margin-left: 20px;">
+        <button id="searchBtn">Search</button>
+        <button id="prevMatchBtn">Prev Match</button>
+        <button id="nextMatchBtn">Next Match</button>
+        <span id="searchResults" style="margin-left:10px;"></span>
+    </div>
+    <div class="pdf-reader">
+        <div id="pdfContainer" class="pdf-container"></div>
+    </div>
+
+    <script src="js/reader.js"></script>
+</body>
+
+</html>
