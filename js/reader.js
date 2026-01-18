@@ -23,6 +23,10 @@
   let totalPages = 0;
   let pageRenderingQueue = Promise.resolve();
 
+  // Search state
+  let searchResults = []; // Array of page numbers with matches
+  let currentMatchIndex = -1; // Current position in searchResults array
+
   // Intersection Observer for scroll tracking
   const observerOptions = {
     root: null,
@@ -155,6 +159,80 @@
       alert("Please enter a valid page number between 1 and " + totalPages);
     }
   });
+
+  // ----- Search functionality -----
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const prevMatchBtn = document.getElementById('prevMatchBtn');
+  const nextMatchBtn = document.getElementById('nextMatchBtn');
+  const searchResultsSpan = document.getElementById('searchResults');
+
+  // Search in PDF using getTextContent API
+  async function searchInPDF() {
+    const query = searchInput.value.trim();
+    if (!query || !pdfDoc) {
+      searchResultsSpan.textContent = '';
+      return;
+    }
+
+    searchResults = [];
+    const lowerQuery = query.toLowerCase();
+
+    // Search through all pages
+    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+      const page = await pdfDoc.getPage(pageNum);
+      const textContent = await page.getTextContent();
+
+      // Combine all text items into a single string
+      const pageText = textContent.items.map(item => item.str).join(' ');
+
+      // Case-insensitive search
+      if (pageText.toLowerCase().includes(lowerQuery)) {
+        searchResults.push(pageNum);
+      }
+    }
+
+    // Update UI with results
+    if (searchResults.length > 0) {
+      searchResultsSpan.textContent = `Found ${searchResults.length} page(s)`;
+      currentMatchIndex = 0;
+      // Scroll to first match
+      currentPage = searchResults[0];
+      scrollToPage(currentPage);
+      updatePageIndicator();
+    } else {
+      searchResultsSpan.textContent = 'No matches found';
+      currentMatchIndex = -1;
+    }
+  }
+
+  // Navigate to next match
+  function goToNextMatch() {
+    if (searchResults.length === 0) return;
+    currentMatchIndex = (currentMatchIndex + 1) % searchResults.length;
+    currentPage = searchResults[currentMatchIndex];
+    scrollToPage(currentPage);
+    updatePageIndicator();
+  }
+
+  // Navigate to previous match
+  function goToPrevMatch() {
+    if (searchResults.length === 0) return;
+    currentMatchIndex = (currentMatchIndex - 1 + searchResults.length) % searchResults.length;
+    currentPage = searchResults[currentMatchIndex];
+    scrollToPage(currentPage);
+    updatePageIndicator();
+  }
+
+  // Event listeners for search
+  searchBtn.addEventListener('click', searchInPDF);
+  searchInput.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      searchInPDF();
+    }
+  });
+  nextMatchBtn.addEventListener('click', goToNextMatch);
+  prevMatchBtn.addEventListener('click', goToPrevMatch);
 
   // ----- Load PDF -----
   const loadingTask = pdfjsLib.getDocument({ url: pdfUrl, withCredentials: false });
