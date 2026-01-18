@@ -243,6 +243,9 @@
   nextMatchBtn.addEventListener('click', goToNextMatch);
   prevMatchBtn.addEventListener('click', goToPrevMatch);
 
+  const a = 12;
+  const b = 13;
+
   // ----- Load PDF -----
   const loadingTask = pdfjsLib.getDocument({ url: pdfUrl, withCredentials: false });
   loadingTask.promise
