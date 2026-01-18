@@ -75,55 +75,18 @@
       chain = chain.then(() => {
         return pdfDoc.getPage(i).then(function (page) {
           const viewport = page.getViewport({ scale: currentScale });
-
-          // Create page container
-          const pageContainer = document.createElement('div');
-          pageContainer.className = 'page-container';
-          pageContainer.id = `page-${i}`;
-          pageContainer.style.position = 'relative';
-          pageContainer.style.margin = '10px auto';
-          pageContainer.style.width = viewport.width + 'px';
-          pageContainer.style.height = viewport.height + 'px';
-
-          // Create canvas
           const canvas = document.createElement('canvas');
+          canvas.id = `page-${i}`;
           const context = canvas.getContext('2d');
           canvas.height = viewport.height;
           canvas.width = viewport.width;
 
-          // Create text layer container
-          const textLayerDiv = document.createElement('div');
-          textLayerDiv.className = 'textLayer';
-
-          // Add canvas and text layer to container
-          pageContainer.appendChild(canvas);
-          pageContainer.appendChild(textLayerDiv);
-          pdfContainer.appendChild(pageContainer);
-
           // Add to observer
-          observer.observe(pageContainer);
+          observer.observe(canvas);
 
-          // Render canvas
           const renderContext = { canvasContext: context, viewport: viewport };
-          return page.render(renderContext).promise.then(() => {
-            // Render text layer
-            return page.getTextContent().then(textContent => {
-              // Manual text layer rendering for PDF.js 2.14.305
-              textContent.items.forEach(item => {
-                const tx = pdfjsLib.Util.transform(
-                  viewport.transform,
-                  item.transform
-                );
-                const span = document.createElement('span');
-                span.textContent = item.str;
-                span.style.left = tx[4] + 'px';
-                span.style.top = (tx[5] - item.height) + 'px';
-                span.style.fontSize = Math.sqrt(tx[2] * tx[2] + tx[3] * tx[3]) + 'px';
-                span.style.fontFamily = item.fontName;
-                textLayerDiv.appendChild(span);
-              });
-            });
-          });
+          pdfContainer.appendChild(canvas);
+          return page.render(renderContext).promise;
         });
       });
     }
@@ -206,159 +169,79 @@
     }
   });
 
-  // ----- Search functionality (Rebuilt) -----
+  // ----- Search functionality -----
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
   const prevMatchBtn = document.getElementById('prevMatchBtn');
   const nextMatchBtn = document.getElementById('nextMatchBtn');
   const searchResultsSpan = document.getElementById('searchResults');
 
-  // Search State
-  let matchedElements = []; // Stores { element: DOMNode, page: number }
-  let currentMatchIdx = -1;
+  // Search in PDF using getTextContent API
+  async function searchInPDF() {
+    const query = searchInput.value.trim();
+    if (!query || !pdfDoc) {
+      searchResultsSpan.textContent = '';
+      return;
+    }
 
-  function clearHighlights() {
-    document.querySelectorAll('.highlight').forEach(el => {
-      // Check if this is a positioning span (direct child of textLayer)
-      if (el.parentElement.classList.contains('textLayer')) {
-        el.classList.remove('highlight');
-        el.classList.remove('active');
-      } else {
-        // It's a nested highlight word - unwrap it
-        const parent = el.parentNode;
-        if (parent) {
-          parent.replaceChild(document.createTextNode(el.textContent), el);
-          parent.normalize();
-        }
+    searchResults = [];
+    const lowerQuery = query.toLowerCase();
+
+    // Search through all pages
+    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+      const page = await pdfDoc.getPage(pageNum);
+      const textContent = await page.getTextContent();
+
+      // Combine all text items into a single string
+      const pageText = textContent.items.map(item => item.str).join(' ');
+
+      // Case-insensitive search
+      if (pageText.toLowerCase().includes(lowerQuery)) {
+        searchResults.push(pageNum);
       }
-    });
-    matchedElements = [];
-    currentMatchIdx = -1;
-    searchResultsSpan.textContent = '';
-  }
+    }
 
-  function searchInPDF() {
-    clearHighlights();
-
-    const rawQuery = searchInput.value.trim();
-    if (!rawQuery) return;
-
-    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(escapeRegExp(rawQuery), 'gi');
-
-    // Get all text spans from the text layers of all pages
-    const allSpans = document.querySelectorAll('.textLayer span');
-
-    // Find matches
-    allSpans.forEach(span => {
-      const text = span.textContent;
-      if (regex.test(text)) {
-        // Find which page this span belongs to
-        const pageContainer = span.closest('.page-container');
-        let pageNum = 1;
-        if (pageContainer && pageContainer.id) {
-          pageNum = parseInt(pageContainer.id.split('-')[1], 10);
-        }
-
-        // Replace text content with highlighted HTML
-        span.innerHTML = text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
-
-        // Capture the NEWLY created highlight elements for navigation
-        const newHighlights = span.querySelectorAll('.highlight');
-        newHighlights.forEach(hl => {
-          matchedElements.push({
-            element: hl,
-            page: pageNum
-          });
-        });
-      }
-    });
-
-    // Update UI
-    if (matchedElements.length > 0) {
-      currentMatchIdx = 0;
-      updateMatchIndicator();
-      highlightActiveMatch();
+    // Update UI with results
+    if (searchResults.length > 0) {
+      searchResultsSpan.textContent = `Found ${searchResults.length} page(s)`;
+      currentMatchIndex = 0;
+      // Scroll to first match
+      currentPage = searchResults[0];
+      scrollToPage(currentPage);
+      updatePageIndicator();
     } else {
       searchResultsSpan.textContent = 'No matches found';
+      currentMatchIndex = -1;
     }
   }
 
-  function updateMatchIndicator() {
-    searchResultsSpan.textContent = `Match ${currentMatchIdx + 1} / ${matchedElements.length}`;
-  }
-
-  function highlightActiveMatch() {
-    // Clear previous active highlight
-    document.querySelectorAll('.highlight.active').forEach(el => el.classList.remove('active'));
-
-    const match = matchedElements[currentMatchIdx];
-    if (match) {
-      match.element.classList.add('active');
-
-      // Scroll the MATCH (span) into view, not just the page
-      match.element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center'
-      });
-
-      // Update current page variable to stay in sync
-      currentPage = match.page;
-      updatePageIndicator();
-    }
-  }
-
+  // Navigate to next match
   function goToNextMatch() {
-    if (matchedElements.length === 0) return;
-    currentMatchIdx++;
-    if (currentMatchIdx >= matchedElements.length) {
-      currentMatchIdx = 0; // Wrap to start
-    }
-    updateMatchIndicator();
-    highlightActiveMatch();
+    if (searchResults.length === 0) return;
+    currentMatchIndex = (currentMatchIndex + 1) % searchResults.length;
+    currentPage = searchResults[currentMatchIndex];
+    scrollToPage(currentPage);
+    updatePageIndicator();
   }
 
+  // Navigate to previous match
   function goToPrevMatch() {
-    if (matchedElements.length === 0) return;
-    currentMatchIdx--;
-    if (currentMatchIdx < 0) {
-      currentMatchIdx = matchedElements.length - 1; // Wrap to end
-    }
-    updateMatchIndicator();
-    highlightActiveMatch();
+    if (searchResults.length === 0) return;
+    currentMatchIndex = (currentMatchIndex - 1 + searchResults.length) % searchResults.length;
+    currentPage = searchResults[currentMatchIndex];
+    scrollToPage(currentPage);
+    updatePageIndicator();
   }
 
   // Event listeners for search
   searchBtn.addEventListener('click', searchInPDF);
-
-  searchInput.addEventListener('keydown', function (e) {
+  searchInput.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
-      if (matchedElements.length > 0) {
-        goToNextMatch();
-      } else {
-        searchInPDF();
-      }
+      searchInPDF();
     }
   });
-
   nextMatchBtn.addEventListener('click', goToNextMatch);
   prevMatchBtn.addEventListener('click', goToPrevMatch);
-
-  // Global Keyboard Shortcuts
-  document.addEventListener('keydown', function (e) {
-    // Ctrl + F (Focus search)
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
-      e.preventDefault();
-      searchInput.focus();
-    }
-    // Esc (Clear search)
-    if (e.key === 'Escape') {
-      searchInput.value = '';
-      clearHighlights();
-      searchInput.blur();
-    }
-  });
 
 
   // ----- Load PDF -----
