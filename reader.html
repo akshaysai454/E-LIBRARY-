@@ -17,10 +17,10 @@
 <body>
     <h1>PDF Reader</h1>
     <div class="controls">
-        <button id="prevPageBtn">Prev</button>
-        <button id="nextPageBtn">Next</button>
-        <button id="zoomOutBtn">–</button>
-        <button id="zoomInBtn">+</button>
+        <button id="prevPageBtn" title="Previous Page">Prev</button>
+        <button id="nextPageBtn" title="Next Page">Next</button>
+        <button id="zoomOutBtn" title="Zoom Out">−</button>
+        <button id="zoomInBtn" title="Zoom In">+</button>
         <input type="number" id="pageInput" min="1" placeholder="Pg #" style="width: 50px; margin-left: 10px;">
         <button id="goPageBtn">Go</button>
         <button id="downloadBtn">Download PDF</button>
@@ -36,6 +36,7 @@
     </div>
 
     <script src="js/reader.js"></script>
+    <script src="js/theme.js"></script>
 </body>
 
 </html>
