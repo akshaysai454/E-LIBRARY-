@@ -4,13 +4,40 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>E‑Library Home</title>
+    <title>E-Library Home</title>
     <link rel="stylesheet" href="style.css" />
+    <style>
+        #homeSearch {
+            display: block;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-main);
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Welcome to the E‑Library</h1>
-    <div class="book-list">
+    <h1>Welcome to the E-Library</h1>
+    
+    <input type="text" id="homeSearch" placeholder="Search for books..." />
+
+    <div class="book-list" id="bookList">
+        <!-- Local File Button -->
+        <a href="reader.html" class="book-item" style="border-color: var(--accent-color);">
+            <div style="width:150px; height:200px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:var(--bg-card); color:var(--accent-color);">
+                <span style="font-size:40px;">📂</span>
+                <span style="margin-top:10px; font-weight:bold;">Open Local PDF</span>
+            </div>
+            <p>From Device</p>
+        </a>
+
         <a href="reader.html?file=https://raw.githubusercontent.com/akshaysai454/E-LIBRARY-/main/FWD%20QB%20MID%202%20Descriptive%20(1).pdf"
             class="book-item">
             <img src="sample_pdf.png" alt="Sample Book" />
@@ -22,6 +49,26 @@
             <p>Sample Book 2</p>
         </a>
     </div>
+
+    <script src="js/theme.js"></script>
+    <script>
+        const searchInput = document.getElementById('homeSearch');
+        const bookList = document.getElementById('bookList');
+        const books = bookList.getElementsByClassName('book-item');
+
+        searchInput.addEventListener('input', function() {
+            const filter = searchInput.value.toLowerCase();
+            
+            Array.from(books).forEach(book => {
+                const title = book.getElementsByTagName('p')[0].innerText.toLowerCase();
+                if (title.includes(filter)) {
+                    book.style.display = "";
+                } else {
+                    book.style.display = "none";
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

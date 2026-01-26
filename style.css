@@ -1,122 +1,199 @@
 /* style.css */
 
-/* Dark theme – page background and light text */
+:root {
+  /* Default Theme (Dark) - Matches original design */
+  --bg-body: #121212;
+  --bg-card: #1e1e1e;
+  --bg-controls: #121212;
+  --bg-input: #1e1e1e;
+  
+  --text-main: #e0e0e0;
+  --text-heading: #fafafa;
+  
+  --border-color: #444;
+  --border-highlight: #555;
+  
+  --shadow-color: rgba(0, 0, 0, 0.6);
+  --accent-color: #4a90e2;
+  --accent-hover: #357ab8;
+
+  /* Search Highlights */
+  --highlight-match: rgba(255, 255, 0, 1);
+  --highlight-selected: rgba(255, 165, 0, 1);
+}
+
+/* Light Theme Overrides */
+body.light-mode {
+  --bg-body: #f4f4f9;
+  --bg-card: #ffffff;
+  --bg-controls: #f4f4f9; /* Match body to hide scroll overlap */
+  --bg-input: #ffffff;
+  
+  --text-main: #333333;
+  --text-heading: #111111;
+  
+  --border-color: #cccccc;
+  --border-highlight: #999999;
+  
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  
+  /* Keep accents similar or adjust if needed */
+  --accent-color: #007bff;
+  --accent-hover: #0056b3;
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 20px;
-  background: #121212;
-  /* dark background */
-  color: #e0e0e0;
-  /* light text for readability */
+  background: var(--bg-body);
+  color: var(--text-main);
+  transition: background 0.3s, color 0.3s;
 }
 
 h1 {
   text-align: center;
-  color: #fafafa;
-  /* ensure heading is visible */
+  color: var(--text-heading);
 }
 
-/* Home page book list – centered */
+/* Theme Toggle Button */
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 8px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 5px var(--shadow-color);
+  transition: all 0.2s;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* Home page book list */
 .book-list {
   display: flex;
   justify-content: center;
-  /* horizontal centering */
   align-items: center;
-  /* vertical centering if needed */
   gap: 20px;
   margin-top: 30px;
+  flex-wrap: wrap;
 }
 
-/* Card style for the book */
 .book-item {
   text-align: center;
   text-decoration: none;
   color: inherit;
-  border: 1px solid #444;
-  /* subtle border for dark mode */
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 10px;
-  background: #1e1e1e;
-  /* slightly lighter than page */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  background: var(--bg-card);
+  box-shadow: 0 2px 6px var(--shadow-color);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.book-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px var(--shadow-color);
 }
 
 .book-item img {
   width: 150px;
   height: 200px;
   object-fit: cover;
-  border: 2px solid #555;
+  border: 2px solid var(--border-highlight);
   border-radius: 4px;
-  transition: transform 0.2s;
 }
 
-.book-item img:hover {
-  transform: scale(1.05);
-  border-color: #777;
-}
-
-/* Reader page */
+/* Reader page controls */
 .controls {
   text-align: right;
   margin-bottom: 10px;
   position: sticky;
   top: 0;
-  background-color: #121212;
-  /* Match body bg to avoid transparency issues */
+  background-color: var(--bg-controls);
   z-index: 1000;
   padding: 10px 0;
-  border-bottom: 1px solid #333;
-  /* Optional visual separation */
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
 }
 
-#downloadBtn {
+button {
   padding: 8px 12px;
-  background: #4a90e2;
+  background: var(--accent-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
-#downloadBtn:hover {
-  background: #357ab8;
+button:hover {
+  background: var(--accent-hover);
 }
 
-/* Search controls */
-#searchInput {
+input[type="text"], input[type="number"] {
   padding: 6px 10px;
-  background: #1e1e1e;
-  color: #e0e0e0;
-  border: 1px solid #444;
+  background: var(--bg-input);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-}
-
-#searchBtn,
-#prevMatchBtn,
-#nextMatchBtn {
-  padding: 6px 12px;
-  background: #4a90e2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-left: 5px;
-}
-
-#searchBtn:hover,
-#prevMatchBtn:hover,
-#nextMatchBtn:hover {
-  background: #357ab8;
 }
 
 #searchResults {
-  color: #fafafa;
+  color: var(--text-main);
   font-size: 14px;
 }
 
-.pdf-container canvas {
+/* Page container */
+.pdf-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-container {
+  position: relative;
   display: block;
   margin: 10px auto;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px var(--shadow-color);
+  background-color: white; /* PDF pages are usually white */
+}
+
+/* Text layer for selectable text */
+.textLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  opacity: 0.2;
+  line-height: 1.0;
+}
+
+.textLayer > span {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+/* Search highlight styles */
+.highlight {
+  background-color: var(--highlight-match) !important;
+}
+
+.highlight.selected {
+  background-color: var(--highlight-selected) !important;
 }
