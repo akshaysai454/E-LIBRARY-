@@ -7,15 +7,19 @@
   const pdfUrl = urlParams.get('file');
 
   // Extract filename from URL for download, or use a default
-  const pdfFileName = pdfUrl ? pdfUrl.split('/').pop().replace(/%20/g, ' ') : 'document.pdf';
+  let pdfFileName = pdfUrl ? pdfUrl.split('/').pop().replace(/%20/g, ' ') : 'document.pdf';
+
+  // UI Elements
+  const pdfContainer = document.getElementById('pdfContainer');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const errorOverlay = document.getElementById('errorOverlay');
+  const errorMessage = document.getElementById('errorMessage');
 
   // Check if PDF URL is provided, otherwise show upload UI
   if (!pdfUrl) {
     showUploadUI();
-    return;
   }
 
-  const pdfContainer = document.getElementById('pdfContainer');
   const downloadBtn = document.getElementById('downloadBtn');
   const zoomInBtn = document.getElementById('zoomInBtn');
   const zoomOutBtn = document.getElementById('zoomOutBtn');
@@ -45,12 +49,6 @@
   let currentPage = 1;
   let totalPages = 0;
   
-  // Load saved progress
-  const savedPage = localStorage.getItem(`reader_progress_${pdfFileName}`);
-  if (savedPage) {
-      currentPage = parseInt(savedPage, 10);
-  }
-
   // Search state
   let searchMatches = []; // Array of {pageNum, spanElement, textContent}
   let currentMatchIndex = -1;
@@ -87,6 +85,22 @@
   }, observerOptions);
 
   // ----- Helper functions -----
+
+  function showLoading(show) {
+      if (loadingOverlay) {
+          loadingOverlay.style.display = show ? 'flex' : 'none';
+      }
+  }
+
+  function showError(msg) {
+      if (errorOverlay && errorMessage) {
+          errorMessage.textContent = msg;
+          errorOverlay.style.display = 'flex';
+      } else {
+          alert(msg);
+      }
+      showLoading(false);
+  }
 
   async function renderAllPagesStacked() {
     if (!pdfDoc) return;
@@ -195,10 +209,15 @@
   
   if (downloadBtn) {
     downloadBtn.addEventListener('click', function () {
+        if (!pdfDoc) return;
+        // If it's a blob URL (local file), we need to handle it carefully
+        // For now, simple download attribute works for both if the browser supports it
         const link = document.createElement('a');
-        link.href = pdfUrl;
+        link.href = pdfUrl || '#';
         link.download = pdfFileName;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
     });
   }
 
@@ -445,7 +464,7 @@
     pdfContainer.style.display = 'flex';
     pdfContainer.style.justifyContent = 'center';
     pdfContainer.style.alignItems = 'center';
-    pdfContainer.style.height = '80vh';
+    pdfContainer.style.height = '60vh';
 
     const uploadBox = document.createElement('div');
     uploadBox.style.textAlign = 'center';
@@ -454,45 +473,71 @@
     uploadBox.style.borderRadius = '10px';
     uploadBox.style.background = 'var(--bg-card)';
     
-    uploadBox.innerHTML = \
+    uploadBox.innerHTML = `
         <h2 style='color:var(--text-heading)'>Open Local PDF</h2>
         <p style='color:var(--text-main); margin-bottom:20px'>Select a PDF file from your device to read</p>
         <input type='file' id='fileInput' accept='.pdf' style='display:none'>
         <button id='uploadTriggerBtn' style='font-size:1.1rem; padding:10px 20px;'>Choose File</button>
-    \;
+    `;
 
     pdfContainer.appendChild(uploadBox);
 
-    document.getElementById('uploadTriggerBtn').addEventListener('click', () => {
-        document.getElementById('fileInput').click();
-    });
-
-    document.getElementById('fileInput').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file && file.type === 'application/pdf') {
-            const fileUrl = URL.createObjectURL(file);
-            loadPDF(fileUrl, file.name);
-        } else {
-            alert('Please select a valid PDF file.');
+    // Event Delegation for dynamically created elements
+    uploadBox.addEventListener('click', (e) => {
+        if (e.target.id === 'uploadTriggerBtn') {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) fileInput.click();
         }
     });
+
+    // We need to attach the change event listener to the file input
+    // Since it's created via innerHTML, we need to find it first
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.type === 'application/pdf') {
+                    const fileUrl = URL.createObjectURL(file);
+                    // Update global pdfFileName for saving progress
+                    pdfFileName = file.name; 
+                    document.title = pdfFileName;
+                    loadPDF(fileUrl, pdfFileName);
+                } else {
+                    alert('Please select a valid PDF file.');
+                }
+            }
+        });
+    }
   }
 
   function loadPDF(url, filename) {
+    showLoading(true);
+    
     // Reset container style
     pdfContainer.style.display = 'block';
     pdfContainer.style.height = 'auto';
     pdfContainer.innerHTML = ''; // Clear upload UI
 
-    // Update global variables
-    // pdfUrl = url; // const, can't assign. We use the arg.
-    // pdfFileName = filename; // const. We need to handle this.
-    
     // Update title
     document.title = filename;
+    // Also update the header if we want to show filename there
+    const headerTitle = document.querySelector('.reader-header h1');
+    if (headerTitle) headerTitle.textContent = filename;
 
     // Load PDF
     const loadingTask = pdfjsLib.getDocument({ url: url, withCredentials: false });
+    
+    loadingTask.onProgress = function(progress) {
+        if (progress.total > 0) {
+            const percent = (progress.loaded / progress.total * 100).toFixed(0);
+            const progressElem = document.getElementById('loadingProgress');
+            if (progressElem) {
+                progressElem.textContent = `${percent}%`;
+            }
+        }
+    };
+
     loadingTask.promise
         .then(function (pdf) {
         pdfDoc = pdf;
@@ -507,11 +552,14 @@
         }
 
         updatePageIndicator();
-        renderAllPagesStacked();
+        return renderAllPagesStacked();
+        })
+        .then(() => {
+            showLoading(false);
         })
         .catch(function (err) {
-        console.error('Error loading PDF:', err);
-        pdfContainer.innerText = 'Failed to load PDF. ' + err.message;
+            console.error('Error loading PDF:', err);
+            showError('Failed to load PDF. ' + err.message);
         });
   }
 

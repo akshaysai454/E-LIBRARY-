@@ -6,49 +6,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>E-Library Home</title>
     <link rel="stylesheet" href="style.css" />
-    <style>
-        #homeSearch {
-            display: block;
-            margin: 20px auto;
-            width: 80%;
-            max-width: 400px;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-input);
-            color: var(--text-main);
-            text-align: center;
-        }
-    </style>
 </head>
 
 <body>
-    <h1>Welcome to the E-Library</h1>
-    
-    <input type="text" id="homeSearch" placeholder="Search for books..." />
+    <header>
+        <h1>Welcome to the E-Library</h1>
+        
+        <div class="search-container">
+            <!-- Search Icon SVG -->
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="homeSearch" placeholder="Search for books..." />
+        </div>
+    </header>
 
-    <div class="book-list" id="bookList">
-        <!-- Local File Button -->
-        <a href="reader.html" class="book-item" style="border-color: var(--accent-color);">
-            <div style="width:150px; height:200px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:var(--bg-card); color:var(--accent-color);">
-                <span style="font-size:40px;">📂</span>
-                <span style="margin-top:10px; font-weight:bold;">Open Local PDF</span>
-            </div>
-            <p>From Device</p>
-        </a>
+    <main>
+        <div class="book-list" id="bookList">
+            <!-- Local File Button -->
+            <a href="reader.html" class="book-item local-pdf-card">
+                <div class="book-cover">
+                    <!-- Folder Icon SVG -->
+                    <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <div class="book-info">
+                    <p class="book-title">Open Local PDF</p>
+                    <small style="color: var(--text-muted); margin-top: 5px;">From Device</small>
+                </div>
+            </a>
 
-        <a href="reader.html?file=https://raw.githubusercontent.com/akshaysai454/E-LIBRARY-/main/FWD%20QB%20MID%202%20Descriptive%20(1).pdf"
-            class="book-item">
-            <img src="sample_pdf.png" alt="Sample Book" />
-            <p>Sample Book</p>
-        </a>
-        <a href="reader.html?file=https://raw.githubusercontent.com/akshaysai454/E-LIBRARY-/main/sample_pdf_2.pdf"
-            class="book-item">
-            <img src="sample_pdf.png" alt="Sample Book 2" />
-            <p>Sample Book 2</p>
-        </a>
-    </div>
+            <!-- Sample Book 1 -->
+            <a href="reader.html?file=https://raw.githubusercontent.com/akshaysai454/E-LIBRARY-/main/FWD%20QB%20MID%202%20Descriptive%20(1).pdf"
+                class="book-item">
+                <img src="sample_pdf.png" alt="Sample Book" class="book-cover" />
+                <div class="book-info">
+                    <p class="book-title">Sample Book</p>
+                </div>
+            </a>
+
+            <!-- Sample Book 2 -->
+            <a href="reader.html?file=https://raw.githubusercontent.com/akshaysai454/E-LIBRARY-/main/sample_pdf_2.pdf"
+                class="book-item">
+                <img src="sample_pdf.png" alt="Sample Book 2" class="book-cover" />
+                <div class="book-info">
+                    <p class="book-title">Sample Book 2</p>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 E-Library Project</p>
+    </footer>
 
     <script src="js/theme.js"></script>
     <script>
@@ -60,11 +72,14 @@
             const filter = searchInput.value.toLowerCase();
             
             Array.from(books).forEach(book => {
-                const title = book.getElementsByTagName('p')[0].innerText.toLowerCase();
-                if (title.includes(filter)) {
-                    book.style.display = "";
-                } else {
-                    book.style.display = "none";
+                const titleElement = book.querySelector('.book-title');
+                if (titleElement) {
+                    const title = titleElement.innerText.toLowerCase();
+                    if (title.includes(filter)) {
+                        book.style.display = "flex"; // Restore to flex since we use flex/grid
+                    } else {
+                        book.style.display = "none";
+                    }
                 }
             });
         });

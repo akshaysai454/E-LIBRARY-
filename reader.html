@@ -15,7 +15,21 @@
 </head>
 
 <body>
-    <h1>PDF Reader</h1>
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Loading PDF...</p>
+        <p id="loadingProgress" style="font-size: 0.9rem; margin-top: 5px; color: #ccc;"></p>
+    </div>
+    
+    <div id="errorOverlay" class="error-overlay" style="display: none;">
+        <p id="errorMessage">Error loading PDF</p>
+        <button onclick="location.reload()">Retry</button>
+    </div>
+
+    <header class="reader-header">
+        <h1>PDF Reader</h1>
+    </header>
+    
     <div class="controls">
         <button id="prevPageBtn" title="Previous Page">Prev</button>
         <button id="nextPageBtn" title="Next Page">Next</button>
