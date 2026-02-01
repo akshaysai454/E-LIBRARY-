@@ -17,14 +17,45 @@
 <body>
     <h1>PDF Reader</h1>
     <div class="controls">
-        <button id="prevPageBtn">Prev</button>
-        <button id="nextPageBtn">Next</button>
-        <button id="zoomOutBtn">–</button>
-        <button id="zoomInBtn">+</button>
-        <input type="number" id="pageInput" min="1" placeholder="Pg #" style="width: 50px; margin-left: 10px;">
-        <button id="goPageBtn">Go</button>
-        <button id="downloadBtn">Download PDF</button>
-        <span id="pageIndicator" style="margin-left:10px;">Page 1 / ?</span>
+        <!-- PDF Search Controls -->
+        <div class="search-controls">
+            <input type="text" id="pdfSearchInput" placeholder="Search in PDF..." />
+            <button id="searchInPdfBtn">Find</button>
+            <button id="prevSearchBtn">←</button>
+            <button id="nextSearchBtn">→</button>
+            <button id="clearSearchBtn">Clear</button>
+            <span id="searchResults" class="search-results"></span>
+        </div>
+        
+        <!-- Navigation Controls -->
+        <div class="nav-controls">
+            <button id="prevPageBtn" class="nav-btn" title="Previous Page (← key)">
+                <span class="btn-icon">←</span>
+                <span class="btn-text">Previous</span>
+            </button>
+            
+            <div class="page-jump-container">
+                <input type="number" id="pageInput" min="1" placeholder="Page #" 
+                       class="page-input" title="Enter page number" />
+                <button id="goPageBtn" class="nav-btn go-btn" title="Go to page">Go</button>
+            </div>
+            
+            <span id="pageIndicator" class="page-indicator">Page 1 / ?</span>
+            
+            <button id="nextPageBtn" class="nav-btn" title="Next Page (→ key)">
+                <span class="btn-text">Next</span>
+                <span class="btn-icon">→</span>
+            </button>
+            
+            <div class="zoom-controls">
+                <button id="zoomOutBtn" class="nav-btn zoom-btn" title="Zoom Out">–</button>
+                <button id="zoomInBtn" class="nav-btn zoom-btn" title="Zoom In">+</button>
+            </div>
+            
+            <button id="downloadBtn" class="nav-btn download-btn" title="Download PDF">Download</button>
+        </div>
+        
+        <div id="pageError" class="page-error" style="display: none;"></div>
     </div>
     <div class="pdf-reader">
         <div id="pdfContainer" class="pdf-container"></div>

@@ -10,12 +10,33 @@
 
 <body>
     <h1>Welcome to the E‑Library</h1>
-    <div class="book-list">
-        <a href="reader.html?file=sample-book.pdf" class="book-item">
+    
+    <!-- Search Section -->
+    <div class="search-container">
+        <input type="text" id="bookSearch" placeholder="Search books by title, author, or keywords..." />
+        <button id="searchBtn">Search</button>
+        <button id="clearSearchBtn">Clear</button>
+    </div>
+    
+    <div class="book-list" id="bookList">
+        <a href="reader.html?file=sample-book.pdf" class="book-item" data-title="Sample Book" data-author="Unknown" data-keywords="sample pdf document">
             <img src="assets/sample_pdf.png" alt="Sample Book" />
             <p>Sample Book</p>
+            <span class="book-author">Unknown Author</span>
+        </a>
+        <!-- Add more books here for demonstration -->
+        <a href="reader.html?file=fwd-qb.pdf" class="book-item" data-title="FWD QB MID 2 Descriptive" data-author="Academic" data-keywords="exam question bank descriptive">
+            <img src="assets/sample_pdf.png" alt="FWD QB" />
+            <p>FWD QB MID 2 Descriptive</p>
+            <span class="book-author">Academic</span>
         </a>
     </div>
+    
+    <div id="noResults" class="no-results" style="display: none;">
+        <p>No books found matching your search criteria.</p>
+    </div>
+    
+    <script src="js/search.js"></script>
 </body>
 
 </html>
