@@ -1,5 +1,5 @@
 // js/reader.js
-// Loads a PDF from a GitHub raw link using PDF.js, provides download and zoom controls.
+// Digital Reader with clean UI, proper page indicator logic, and full search functionality
 
 (function () {
   // Read PDF URL from query parameter
@@ -38,13 +38,11 @@
   const nextMatchBtn = document.getElementById('nextMatchBtn');
   const searchResultsSpan = document.getElementById('searchResults');
 
-  // Shared zoom scale
   let currentScale = 1.5;
   const scaleStep = 0.2;
   const minScale = 0.5;
   const maxScale = 3.0;
 
-  // PDF.js document reference
   let pdfDoc = null;
   let currentPage = 1;
   let totalPages = 0;
@@ -55,7 +53,7 @@
   let currentSearchTerm = '';
   let pageTextLayers = {}; // Store text layer references for each page
 
-  // Intersection Observer for scroll tracking
+  // Intersection Observer for automatic page tracking
   const observerOptions = {
     root: null,
     rootMargin: '0px',
@@ -84,7 +82,12 @@
     }
   }, observerOptions);
 
-  // ----- Helper functions -----
+  // Update page indicator with proper format: Page X of Y
+  function updatePageIndicator() {
+    if (pageIndicator && totalPages > 0) {
+      pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+  }
 
   function showLoading(show) {
       if (loadingOverlay) {
@@ -184,6 +187,7 @@
     pageTextLayers[pageNum] = textLayerDiv;
   }
 
+  // Scroll to specific page
   function scrollToPage(pageNum) {
     const elem = document.getElementById(`page-container-${pageNum}`);
     if (elem) {
@@ -203,6 +207,8 @@
     if (pageInput) {
         pageInput.value = currentPage; // Keep input synced
     }
+    updatePageIndicator();
+    updateNavigationButtons();
   }
 
   // ----- Event listeners -----

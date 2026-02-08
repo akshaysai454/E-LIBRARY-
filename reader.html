@@ -4,12 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PDF Reader</title>
+    <title>Digital Reader</title>
     <link rel="stylesheet" href="style.css" />
     <!-- PDF.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
     <script>
-        // Set the workerSrc property for PDF.js
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
     </script>
 </head>
@@ -47,7 +46,33 @@
     </div>
     <div class="pdf-reader">
         <div id="pdfContainer" class="pdf-container"></div>
-    </div>
+    </main>
+
+    <!-- Footer Control Bar -->
+    <footer class="control-bar">
+        <div class="control-group">
+            <button class="control-btn" id="prevPageBtn" aria-label="Previous Page">
+                <span class="btn-icon">‹</span>
+                <span class="btn-text">Previous</span>
+            </button>
+            
+            <div class="page-jump">
+                <input type="number" id="pageInput" min="1" placeholder="Page" aria-label="Jump to page">
+                <button class="control-btn small" id="goPageBtn">Go</button>
+            </div>
+            
+            <button class="control-btn" id="nextPageBtn" aria-label="Next Page">
+                <span class="btn-text">Next</span>
+                <span class="btn-icon">›</span>
+            </button>
+        </div>
+        
+        <div class="secondary-controls">
+            <button class="icon-btn" id="zoomOutBtn" aria-label="Zoom Out" title="Zoom Out">−</button>
+            <button class="icon-btn" id="zoomInBtn" aria-label="Zoom In" title="Zoom In">+</button>
+            <button class="icon-btn" id="downloadBtn" aria-label="Download" title="Download PDF">↓</button>
+        </div>
+    </footer>
 
     <script src="js/reader.js"></script>
     <script src="js/theme.js"></script>
