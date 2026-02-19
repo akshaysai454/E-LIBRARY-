@@ -1,0 +1,35 @@
+{
+  "name": "database-management-system",
+  "version": "1.0.0",
+  "description": "Production-ready database management system with MongoDB and MySQL support",
+  "main": "index.js",
+  "scripts": {
+    "test": "node examples.js",
+    "mongodb-example": "node -e \"require('./examples').mongoDBExamples()\"",
+    "mysql-example": "node -e \"require('./examples').mySQLExamples()\"",
+    "validation-example": "node -e \"require('./examples').validationExamples()\"",
+    "security-example": "node -e \"require('./examples').securityExamples()\""
+  },
+  "keywords": [
+    "database",
+    "mongodb",
+    "mysql",
+    "user-management",
+    "authentication",
+    "validation",
+    "security"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "mongoose": "^7.0.0",
+    "mysql2": "^3.0.0",
+    "bcrypt": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
