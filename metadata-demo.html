@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metadata Architecture System - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #1e293b;
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        textarea {
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-right: 8px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button.secondary {
+            background: #64748b;
+        }
+
+        button.secondary:hover {
+            background: #475569;
+        }
+
+        button.danger {
+            background: #dc2626;
+        }
+
+        button.danger:hover {
+            background: #b91c1c;
+        }
+
+        .output {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+
+        .message.success {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 4px solid #22c55e;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .message.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .metadata-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .metadata-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 3px solid #2563eb;
+        }
+
+        .metadata-item h4 {
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .metadata-item p {
+            font-size: 13px;
+            color: #64748b;
+            margin: 2px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Metadata Architecture System</h1>
+        <p class="subtitle">Robust metadata creation, validation, and management with logical processing</p>
+
+        <!-- Statistics -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Total Entries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="validCount">0</div>
+                <div class="stat-label">Valid Entries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="warningCount">0</div>
+                <div class="stat-label">Warnings</div>
+            </div>
+        </div>
+
+        <!-- Create Metadata Form -->
+        <div class="section">
+            <h2>Create Metadata</h2>
+            <div id="messages"></div>
+            
+            <div class="grid">
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" id="title" placeholder="Enter document title">
+                </div>
+                
+                <div class="form-group">
+                    <label>Author(s) *</label>
+                    <input type="text" id="author" placeholder="Single author or comma-separated">
+                    <small style="color: #64748b;">Separate multiple authors with commas</small>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="form-group">
+                    <label>Zone *</label>
+                    <select id="zone">
+                        <option value="">-- Auto-detect --</option>
+                        <option value="programming">Programming</option>
+                        <option value="web-development">Web Development</option>
+                        <option value="data-science">Data Science</option>
+                        <option value="design">Design</option>
+                        <option value="business">Business</option>
+                        <option value="fiction">Fiction</option>
+                        <option value="non-fiction">Non-Fiction</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Version</label>
+                    <input type="text" id="version" placeholder="1.0.0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Context (for zone inference)</label>
+                <input type="text" id="context" placeholder="e.g., category, tags">
+            </div>
+
+            <button onclick="createMetadata()">Create Metadata</button>
+            <button class="secondary" onclick="clearForm()">Clear Form</button>
+        </div>
+
+        <!-- Metadata List -->
+        <div class="section">
+            <h2>Metadata Entries</h2>
+            <div class="metadata-list" id="metadataList">
+                <p style="color: #94a3b8; text-align: center; padding: 20px;">No metadata entries yet</p>
+            </div>
+            <div style="margin-top: 16px;">
+                <button class="secondary" onclick="deduplicateMetadata()">Deduplicate</button>
+                <button class="danger" onclick="clearAllMetadata()">Clear All</button>
+            </div>
+        </div>
+
+        <!-- Export/Import -->
+        <div class="section">
+            <h2>Export / Import JSON</h2>
+            <div class="form-group">
+                <label>metadata.json</label>
+                <textarea id="jsonOutput" readonly></textarea>
+            </div>
+            <button onclick="exportJSON()">Export JSON</button>
+            <button onclick="downloadJSON()">Download JSON File</button>
+            <button class="secondary" onclick="importJSON()">Import from Textarea</button>
+        </div>
+
+        <!-- System Log -->
+        <div class="section">
+            <h2>System Log</h2>
+            <div class="output" id="systemLog">System initialized...</div>
+        </div>
+    </div>
+
+    <script src="js/metadata-system.js"></script>
+    <script>
+        // Initialize manager
+        const manager = new MetadataManager();
+        let warningCount = 0;
+
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('systemLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : type === 'success' ? '✓' : 'ℹ️';
+            logEl.textContent += `\n[${timestamp}] ${prefix} ${message}`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function showMessage(message, type = 'success') {
+            const messagesEl = document.getElementById('messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${type}`;
+            msgDiv.textContent = message;
+            messagesEl.appendChild(msgDiv);
+            
+            setTimeout(() => msgDiv.remove(), 5000);
+        }
+
+        function updateStats() {
+            const metadata = manager.getAllMetadata();
+            document.getElementById('totalCount').textContent = metadata.length;
+            document.getElementById('validCount').textContent = metadata.length;
+            document.getElementById('warningCount').textContent = warningCount;
+        }
+
+        function updateMetadataList() {
+            const listEl = document.getElementById('metadataList');
+            const metadata = manager.getAllMetadata();
+
+            if (metadata.length === 0) {
+                listEl.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">No metadata entries yet</p>';
+                return;
+            }
+
+            listEl.innerHTML = metadata.map((item, index) => `
+                <div class="metadata-item">
+                    <h4>${item.title}</h4>
+                    <p><strong>Author:</strong> ${Array.isArray(item.author) ? item.author.join(', ') : item.author}</p>
+                    <p><strong>Zone:</strong> ${item.zone} | <strong>Version:</strong> ${item.version || 'N/A'}</p>
+                    <p><strong>Created:</strong> ${new Date(item.created_at).toLocaleString()}</p>
+                </div>
+            `).join('');
+        }
+
+        function createMetadata() {
+            const title = document.getElementById('title').value;
+            const authorInput = document.getElementById('author').value;
+            const zone = document.getElementById('zone').value;
+            const version = document.getElementById('version').value;
+            const contextInput = document.getElementById('context').value;
+
+            // Parse authors
+            let author = authorInput;
+            if (authorInput.includes(',')) {
+                author = authorInput.split(',').map(a => a.trim()).filter(a => a);
+            }
+
+            // Parse context
+            const context = contextInput ? { category: contextInput } : {};
+
+            const input = {
+                title: title || undefined,
+                author: author || undefined,
+                zone: zone || undefined,
+                version: version || undefined
+            };
+
+            try {
+                const metadata = manager.addMetadata(input, context);
+                const warnings = manager.processor.getWarnings();
+                
+                if (warnings.length > 0) {
+                    warningCount += warnings.length;
+                    warnings.forEach(w => {
+                        log(`Warning: ${w.field} - ${w.message}`, 'warning');
+                        showMessage(`Warning: ${w.message}`, 'warning');
+                    });
+                }
+
+                log(`Created metadata: ${metadata.title}`, 'success');
+                showMessage('Metadata created successfully!', 'success');
+                
+                updateStats();
+                updateMetadataList();
+                updateJSONOutput();
+                clearForm();
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('title').value = '';
+            document.getElementById('author').value = '';
+            document.getElementById('zone').value = '';
+            document.getElementById('version').value = '';
+            document.getElementById('context').value = '';
+        }
+
+        function deduplicateMetadata() {
+            const beforeCount = manager.getAllMetadata().length;
+            manager.deduplicate();
+            const afterCount = manager.getAllMetadata().length;
+            const removed = beforeCount - afterCount;
+
+            if (removed > 0) {
+                log(`Removed ${removed} duplicate entries`, 'success');
+                showMessage(`Removed ${removed} duplicate entries`, 'success');
+            } else {
+                showMessage('No duplicates found', 'success');
+            }
+
+            updateStats();
+            updateMetadataList();
+            updateJSONOutput();
+        }
+
+        function clearAllMetadata() {
+            if (confirm('Are you sure you want to clear all metadata?')) {
+                manager.clear();
+                warningCount = 0;
+                log('All metadata cleared', 'info');
+                showMessage('All metadata cleared', 'success');
+                updateStats();
+                updateMetadataList();
+                updateJSONOutput();
+            }
+        }
+
+        function updateJSONOutput() {
+            const json = manager.exportJSON();
+            document.getElementById('jsonOutput').value = json;
+        }
+
+        function exportJSON() {
+            updateJSONOutput();
+            showMessage('JSON exported to textarea', 'success');
+            log('JSON exported', 'success');
+        }
+
+        function downloadJSON() {
+            const json = manager.exportJSON();
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'metadata.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            log('JSON file downloaded', 'success');
+            showMessage('metadata.json downloaded', 'success');
+        }
+
+        function importJSON() {
+            const jsonString = document.getElementById('jsonOutput').value;
+            
+            if (!jsonString.trim()) {
+                showMessage('Please paste JSON data first', 'error');
+                return;
+            }
+
+            const success = manager.importJSON(jsonString);
+            
+            if (success) {
+                log('JSON imported successfully', 'success');
+                showMessage('JSON imported successfully', 'success');
+                updateStats();
+                updateMetadataList();
+            } else {
+                log('JSON import failed', 'error');
+                showMessage('Invalid JSON format', 'error');
+            }
+        }
+
+        // Initialize
+        updateStats();
+        log('Metadata Architecture System ready');
+    </script>
+</body>
+</html>
