@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- // Input for URL -->
+    <input
+      type="text"
+      id="pdfUrl"
+      placeholder="Enter GitHub/Local PDF URL"
+      size="60"
+    />
+    <button onclick="loadPDF()">Load PDF</button>
+    <button onclick="downloadPDF()">Download PDF</button>
+
+    <!-- PDF Viewer -->
+    <iframe
+      id="viewer"
+      width="600"
+      height="400"
+      style="margin-top: 20px"
+    ></iframe>
+
+    <script>
+      let currentBlob = null; // store PDF blob for download
+
+      async function loadPDF() {
+        const url = document.getElementById("pdfUrl").value;
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error("Failed to load PDF");
+          const blob = await response.blob();
+          currentBlob = blob;
+
+          // Display in iframe
+          const objectURL = URL.createObjectURL(blob);
+          document.getElementById("viewer").src = objectURL;
+        } catch (error) {
+          alert("Error: " + error.message);
+        }
+      }
+      function downloadPDF() {
+        if (!currentBlob) {
+          alert("No PDF loaded yet!");
+          return;
+        }
+        const url = URL.createObjectURL(currentBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "E-Library.pdf"; // default filename
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    </script>
+  </body>
+</html>
