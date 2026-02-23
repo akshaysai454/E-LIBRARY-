@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-Library Home</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f9f9f9;
+    }
+    header {
+      background: #333;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .search-container {
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 5px;
+      padding: 5px 10px;
+    }
+    .search-container input {
+      border: none;
+      outline: none;
+      margin-left: 5px;
+    }
+    .book-list {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 20px;
+      gap: 20px;
+    }
+    .book-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 150px;
+      text-decoration: none;
+      color: black;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 10px;
+    }
+    .book-cover {
+      width: 100px;
+      height: 140px;
+      background: #ddd;
+      margin-bottom: 10px;
+    }
+    .book-info {
+      text-align: center;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #333;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>E-Library</h1>
+    <div class="search-container">
+      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="homeSearch" placeholder="Search by title, author, tags..." />
+    </div>
+  </header>
+
+  <main>
+    <div class="book-list" id="bookList">
+      <!-- Book 1 -->
+      <a href="reader.html?file=sample1.pdf"
+         class="book-item"
+         data-title="Sample Book"
+         data-author="John Doe"
+         data-tags="mathematics, logic"
+         data-year="2024">
+        <img src="sample_pdf.png" alt="Sample Book" class="book-cover" />
+        <div class="book-info">
+          <p class="book-title">Sample Book</p>
+          <small>Author: John Doe</small>
+        </div>
+      </a>
+
+      <!-- Book 2 -->
+      <a href="reader.html?file=sample2.pdf"
+         class="book-item"
+         data-title="Sample Book 2"
+         data-author="Jane Smith"
+         data-tags="computer science, algorithms"
+         data-year="2023">
+        <img src="sample_pdf.png" alt="Sample Book 2" class="book-cover" />
+        <div class="book-info">
+          <p class="book-title">Sample Book 2</p>
+          <small>Author: Jane Smith</small>
+        </div>
+      </a>
+
+      <!-- Book 3 -->
+      <a href="reader.html?file=sample3.pdf"
+         class="book-item"
+         data-title="Advanced Algorithms"
+         data-author="Alan Turing"
+         data-tags="algorithms, AI, computing"
+         data-year="1950">
+        <img src="sample_pdf.png" alt="Advanced Algorithms" class="book-cover" />
+        <div class="book-info">
+          <p class="book-title">Advanced Algorithms</p>
+          <small>Author: Alan Turing</small>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 E-Library Project</p>
+  </footer>
+
+  <script>
+    const searchInput = document.getElementById("homeSearch");
+    const bookList = document.getElementById("bookList");
+    const books = bookList.getElementsByClassName("book-item");
+
+    searchInput.addEventListener("input", function () {
+      const filter = searchInput.value.toLowerCase();
+
+      Array.from(books).forEach((book) => {
+        const title = book.getAttribute("data-title")?.toLowerCase() || "";
+        const author = book.getAttribute("data-author")?.toLowerCase() || "";
+        const tags = book.getAttribute("data-tags")?.toLowerCase() || "";
+        const year = book.getAttribute("data-year")?.toLowerCase() || "";
+
+        if (
+          title.includes(filter) ||
+          author.includes(filter) ||
+          tags.includes(filter) ||
+          year.includes(filter)
+        ) {
+          book.style.display = "flex";
+        } else {
+          book.style.display = "none";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Reader</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+    }
+    #viewerContainer {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow: auto;
+      background: #f0f0f0;
+    }
+    .page {
+      position: relative;
+      margin: 20px auto;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      background: white;
+    }
+    .textLayer {
+      position: absolute;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      color: transparent; /* invisible but selectable */
+    }
+  </style>
+</head>
+<body>
+  <div id="viewerContainer"></div>
+
+  <!-- PDF.js core and viewer -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf_viewer.min.js"></script>
+
+  <script>
+    // Get file from query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const fileUrl = urlParams.get("file") || "sample.pdf";
+
+    const container = document.getElementById("viewerContainer");
+
+    // PDF.js setup
+    const eventBus = new pdfjsViewer.EventBus();
+    const pdfLinkService = new pdfjsViewer.PDFLinkService({ eventBus });
+    const pdfFindController = new pdfjsViewer.PDFFindController({ eventBus, linkService: pdfLinkService });
+
+    const pdfViewer = new pdfjsViewer.PDFViewer({
+      container,
+      eventBus,
+      linkService: pdfLinkService,
+      findController: pdfFindController,
+      textLayerMode: 2 // <-- ENABLE text layer
+    });
+
+    pdfLinkService.setViewer(pdfViewer);
+
+    // Load the PDF
+    pdfjsLib.getDocument(fileUrl).promise.then(pdfDocument => {
+      pdfViewer.setDocument(pdfDocument);
+      pdfLinkService.setDocument(pdfDocument, null);
+    });
+
+    // Optional: auto-fit pages
+    eventBus.on("pagesinit", () => {
+      pdfViewer.currentScaleValue = "page-width";
+    });
+
+    // Example: trigger search programmatically
+    // pdfFindController.executeCommand("find", { query: "keyword" });
+  </script>
+</body>
+</html>
