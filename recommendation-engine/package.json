@@ -1,0 +1,36 @@
+{
+  "name": "recommendation-engine",
+  "version": "1.0.0",
+  "description": "Intelligent recommendation system for scenes, templates, and story elements",
+  "main": "recommendation-engine.js",
+  "scripts": {
+    "test": "node examples.js",
+    "example:coldstart": "node -e \"require('./examples').example1_ColdStart()\"",
+    "example:history": "node -e \"require('./examples').example2_CrimeSceneUser()\"",
+    "example:diverse": "node -e \"require('./examples').example3_DiverseInterests()\"",
+    "example:context": "node -e \"require('./examples').example4_ContextAware()\"",
+    "example:feedback": "node -e \"require('./examples').example5_FeedbackLoop()\"",
+    "example:realtime": "node -e \"require('./examples').example6_RealTimeUpdates()\"",
+    "example:stats": "node -e \"require('./examples').example7_Statistics()\"",
+    "examples": "node examples.js"
+  },
+  "keywords": [
+    "recommendation",
+    "recommendation-engine",
+    "collaborative-filtering",
+    "content-based",
+    "personalization",
+    "machine-learning",
+    "trending",
+    "popularity",
+    "user-behavior",
+    "analytics"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
